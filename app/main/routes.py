@@ -19,7 +19,18 @@ import os
 @main_bp.route("/run-seed-once")
 def run_seed_once():
     """One-time seed trigger. DELETE THIS ROUTE after you've used it."""
-    if request.args.get("key") != os.environ.get("SEED_SECRET"):
+    provided = request.args.get("key", "")
+    expected = os.environ.get("SEED_SECRET", "")
+
+    if request.args.get("debug") == "1":
+        return {
+            "seed_secret_is_set": bool(expected),
+            "seed_secret_length": len(expected),
+            "provided_key_length": len(provided),
+            "match": provided == expected,
+        }
+
+    if provided != expected:
         abort(404)
 
     from seed import run as seed_run
@@ -407,3 +418,4 @@ def notifications():
     Notification.query.filter_by(user_id=current_user.id, is_read=False).update({"is_read": True})
     db.session.commit()
     return render_template("main/notifications.html", items=items)
+    
