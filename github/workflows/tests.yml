@@ -1,0 +1,31 @@
+name: Tests
+
+# Railway auto-deploys on every push to the connected branch (no separate
+# CD config needed here — see README.md "Deploy to Railway + Supabase").
+# This workflow just gates merges with the test suite so broken code
+# doesn't reach the branch Railway watches.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run test suite
+        env:
+          SECRET_KEY: ci-test-secret-key
+        run: pytest
