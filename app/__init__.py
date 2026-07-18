@@ -137,6 +137,8 @@ def create_app(config_class=Config):
             return f"{app.config['CURRENCY_SYMBOL']}{float(value):,.0f}"
         except (TypeError, ValueError):
             return value
+    with app.app_context():
+    db.create_all()
 
     return app
 
