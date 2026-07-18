@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/admin_sidebar.html" %}
+  <div class="space-y-5">
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+      <h3 class="font-bold text-sm mb-3">Add Category</h3>
+      <form method="POST" class="flex gap-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input name="name" placeholder="Category name" required class="flex-1 bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+        <input name="icon" placeholder="bi-tag (Bootstrap Icons class)" class="w-64 bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+        <button class="bg-violet-600 text-white text-sm font-bold rounded-xl px-5">Add</button>
+      </form>
+    </div>
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+      <h3 class="font-bold text-sm mb-3">Categories ({{ categories|length }})</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {% for c in categories %}
+        <div class="border border-[#E7E3F5] rounded-xl p-3 flex items-center gap-2">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white"><i class="bi {{ c.icon }}"></i></div>
+          <span class="text-xs font-semibold">{{ c.name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

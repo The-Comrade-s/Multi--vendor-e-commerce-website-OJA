@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Chat{% endblock %}
+{% block content %}
+{% if is_vendor_party %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div>{% include "chat/_thread_body.html" %}</div>
+</div>
+{% else %}
+<div class="max-w-2xl mx-auto px-5 py-6">
+  {% include "chat/_thread_body.html" %}
+</div>
+{% endif %}
+{% endblock %}

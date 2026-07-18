@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Vendor Dashboard{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div class="space-y-5">
+
+    {% if profile.status != 'verified' %}
+    <div class="bg-amber-50 text-amber-700 rounded-2xl px-4 py-3 text-sm font-semibold flex items-center gap-2">
+      <i class="bi bi-hourglass-split"></i>
+      {% if profile.status == 'pending' %}Your store is awaiting admin verification. You can't publish products until you're verified.
+      {% elif profile.status == 'rejected' %}Your store application was rejected. Contact support for details.
+      {% else %}Your store has been suspended. Contact support.{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5"><p class="text-xs font-semibold text-[#6B6480]">Total Sales</p><p class="text-2xl font-bold mt-1.5 font-display">{{ total_sales | naira }}</p></div>
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5"><p class="text-xs font-semibold text-[#6B6480]">Orders</p><p class="text-2xl font-bold mt-1.5 font-display">{{ order_count }}</p></div>
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5"><p class="text-xs font-semibold text-[#6B6480]">Products</p><p class="text-2xl font-bold mt-1.5 font-display">{{ product_count }}</p></div>
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5"><p class="text-xs font-semibold text-[#6B6480]">Store Status</p><p class="text-2xl font-bold mt-1.5 font-display capitalize">{{ profile.status }}</p></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+        <h3 class="font-bold text-sm mb-3">Recent Orders</h3>
+        {% for o in recent_orders %}
+        <div class="flex items-center justify-between py-1.5 text-xs">
+          <span class="font-mono font-semibold">#{{ o.order_number }}</span>
+          <span class="px-2 py-0.5 rounded-full font-bold bg-gray-100 text-gray-600">{{ o.status|capitalize }}</span>
+        </div>
+        {% else %}
+        <p class="text-xs text-[#6B6480]">No orders yet.</p>
+        {% endfor %}
+      </div>
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+        <h3 class="font-bold text-sm mb-3">Low Stock Products</h3>
+        {% for p in low_stock %}
+        <div class="flex items-center justify-between py-1.5 text-xs">
+          <span class="font-semibold">{{ p.name }}</span>
+          <span class="px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-700">{{ p.stock }} left</span>
+        </div>
+        {% else %}
+        <p class="text-xs text-[#6B6480]">Nothing low on stock.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

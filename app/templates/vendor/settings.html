@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Store Settings{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl p-6 max-w-2xl">
+    <h3 class="font-bold mb-4">Store Settings</h3>
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-violet-600 text-white flex items-center justify-center text-xl font-bold overflow-hidden">
+          {% if profile.logo_filename %}<img src="{{ url_for('static', filename='uploads/' + profile.logo_filename) }}" class="w-full h-full object-cover">{% else %}{{ profile.store_name[0] }}{% endif %}
+        </div>
+        <div>
+          <label class="text-xs font-semibold mb-1.5 block">Store Logo</label>
+          <input type="file" name="logo" accept="image/*" class="text-xs">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-semibold mb-1.5 block">Store Banner</label>
+        <input type="file" name="banner" accept="image/*" class="text-xs">
+      </div>
+      <div><label class="text-xs font-semibold mb-1.5 block">Store Name</label><input value="{{ profile.store_name }}" disabled class="w-full bg-[#F1EEFB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm text-[#6B6480]"></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="text-xs font-semibold mb-1.5 block">City</label><input name="city" value="{{ profile.city or '' }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+        <div><label class="text-xs font-semibold mb-1.5 block">State</label><input name="state" value="{{ profile.state or '' }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+      </div>
+      <div><label class="text-xs font-semibold mb-1.5 block">Store Description</label><textarea name="description" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm h-24">{{ profile.description or '' }}</textarea></div>
+      <button class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl px-5 py-2.5">Save Changes</button>
+    </form>
+    <p class="text-xs text-[#6B6480] mt-4">Store status: <span class="font-bold capitalize">{{ profile.status }}</span></p>
+  </div>
+</div>
+{% endblock %}

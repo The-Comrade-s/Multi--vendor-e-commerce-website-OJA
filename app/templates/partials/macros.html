@@ -1,0 +1,53 @@
+{% macro stars(rating) %}
+<div class="flex items-center gap-0.5">
+  {% for i in range(1,6) %}
+    <i class="bi {{ 'bi-star-fill text-amber-400' if i <= rating|round(0,'floor') else 'bi-star text-gray-300' }} text-[11px]"></i>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro product_card(p) %}
+<div class="product-card group bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-violet-600/10 hover:-translate-y-1 transition-all duration-300">
+  <div class="relative h-40 bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center">
+    <a href="{{ url_for('main.product_detail', slug=p.slug) }}" class="absolute inset-0 flex items-center justify-center">
+      {% if p.discount_percent %}
+        <span class="absolute top-2 left-2 bg-amber-100 text-amber-700 text-[11px] font-bold px-2 py-0.5 rounded-full">-{{ p.discount_percent }}%</span>
+      {% endif %}
+      <i class="bi {{ p.icon }} text-white/90" style="font-size:3rem;"></i>
+    </a>
+    {% if current_user.is_authenticated and current_user.is_customer %}
+    <form action="{{ url_for('main.wishlist_toggle', product_id=p.id) }}" method="POST" class="absolute top-2 right-2 z-10">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-violet-700 hover:bg-white"><i class="bi bi-heart"></i></button>
+    </form>
+    {% endif %}
+  </div>
+  <div class="p-3.5">
+    <div class="flex items-center gap-1 mb-1">
+      <span class="text-[11px] font-semibold text-[#6B6480] truncate">{{ p.vendor.store_name }}</span>
+      {% if p.vendor.is_verified %}<i class="bi bi-patch-check-fill text-blue-500 text-[11px]"></i>{% endif %}
+    </div>
+    <a href="{{ url_for('main.product_detail', slug=p.slug) }}" class="text-sm font-semibold leading-snug line-clamp-2 h-10 block">{{ p.name }}</a>
+    <div class="flex items-center gap-1.5 mt-1.5">
+      {{ stars(p.avg_rating) }}
+      <span class="text-[11px] text-[#6B6480]">({{ p.review_count }})</span>
+    </div>
+    <div class="flex items-baseline gap-1.5 mt-2">
+      <span class="font-bold font-mono text-[15px]">{{ p.price | naira }}</span>
+      {% if p.compare_at_price %}<span class="text-xs line-through text-[#6B6480]">{{ p.compare_at_price | naira }}</span>{% endif %}
+    </div>
+    <p class="text-[11px] font-semibold mt-1 {{ 'text-emerald-500' if p.stock_label == 'In Stock' else 'text-amber-500' if p.stock_label == 'Low Stock' else 'text-rose-500' }}">{{ p.stock_label }}</p>
+    <div class="flex gap-1.5 mt-3">
+      {% if current_user.is_authenticated and current_user.is_customer %}
+      <form action="{{ url_for('main.cart_add', product_id=p.id) }}" method="POST" class="flex-1">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button {{ 'disabled' if not p.in_stock }} class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 disabled:opacity-40 text-white text-xs font-bold rounded-lg py-2"><i class="bi bi-cart-plus"></i> Add</button>
+      </form>
+      {% else %}
+      <a href="{{ url_for('auth.login') }}" class="flex-1 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold rounded-lg py-2 text-center"><i class="bi bi-cart-plus"></i> Add</a>
+      {% endif %}
+      <a href="{{ url_for('main.product_detail', slug=p.slug) }}" class="flex-1 border border-violet-200 text-violet-700 text-xs font-bold rounded-lg py-2 text-center">View</a>
+    </div>
+  </div>
+</div>
+{% endmacro %}

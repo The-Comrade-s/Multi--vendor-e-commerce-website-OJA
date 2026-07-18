@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Receipt — {{ order.order_number }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print { .no-print { display: none; } }
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-[#F7F6FB] p-6">
+  <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E7E3F5] p-8">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-bold" style="font-family:'Space Grotesk',sans-serif;">O</div>
+        <span class="font-bold text-lg" style="font-family:'Space Grotesk',sans-serif;">OJÀ<span class="text-violet-600">.</span></span>
+      </div>
+      <button onclick="window.print()" class="no-print bg-violet-600 text-white text-xs font-bold rounded-lg px-4 py-2">Print / Save PDF</button>
+    </div>
+
+    <h1 class="text-xl font-bold" style="font-family:'Space Grotesk',sans-serif;">Receipt</h1>
+    <p class="text-sm text-[#6B6480]">Order #{{ order.order_number }} — {{ order.created_at.strftime('%B %d, %Y') }}</p>
+
+    <div class="grid grid-cols-2 gap-4 my-5 text-sm">
+      <div>
+        <p class="font-bold text-xs text-[#6B6480] uppercase">Billed To</p>
+        <p>{{ order.full_name }}</p>
+        <p>{{ order.address }}, {{ order.city }}, {{ order.state }}</p>
+        <p>{{ order.phone }}</p>
+      </div>
+      <div class="text-right">
+        <p class="font-bold text-xs text-[#6B6480] uppercase">Payment</p>
+        <p class="capitalize">{{ order.payment_method.replace('_',' ') }}</p>
+        <p class="capitalize">{{ order.payment_status }}</p>
+      </div>
+    </div>
+
+    <table class="w-full text-sm mb-4">
+      <thead><tr class="text-xs uppercase text-[#6B6480] border-b border-[#E7E3F5]"><th class="text-left py-2">Item</th><th class="text-center py-2">Qty</th><th class="text-right py-2">Amount</th></tr></thead>
+      <tbody>
+        {% for item in order.items %}
+        <tr class="border-b border-[#E7E3F5]">
+          <td class="py-2">{{ item.product_name }}</td>
+          <td class="py-2 text-center">{{ item.quantity }}</td>
+          <td class="py-2 text-right" style="font-family:'JetBrains Mono',monospace;">{{ item.line_total | naira }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="space-y-1 text-sm ml-auto max-w-[200px]">
+      <div class="flex justify-between"><span class="text-[#6B6480]">Subtotal</span><span style="font-family:'JetBrains Mono',monospace;">{{ order.subtotal | naira }}</span></div>
+      {% if order.discount_amount %}<div class="flex justify-between text-emerald-600"><span>Discount</span><span style="font-family:'JetBrains Mono',monospace;">-{{ order.discount_amount | naira }}</span></div>{% endif %}
+      <div class="flex justify-between"><span class="text-[#6B6480]">Delivery</span><span style="font-family:'JetBrains Mono',monospace;">{{ 'Free' if order.delivery_fee == 0 else (order.delivery_fee | naira) }}</span></div>
+      <div class="flex justify-between font-bold border-t border-[#E7E3F5] pt-1 mt-1"><span>Total</span><span style="font-family:'JetBrains Mono',monospace;">{{ order.total | naira }}</span></div>
+    </div>
+
+    <p class="text-center text-xs text-[#6B6480] mt-8">Thank you for shopping on OJÀ.</p>
+  </div>
+</body>
+</html>

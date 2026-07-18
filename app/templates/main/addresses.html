@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}My Addresses{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-5 py-6">
+  <h1 class="text-xl font-bold font-display mb-4">My Addresses</h1>
+
+  <div class="space-y-3 mb-6">
+    {% for a in addresses %}
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-4 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-bold flex items-center gap-2">{{ a.label }} {% if a.is_default %}<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Default</span>{% endif %}</p>
+        <p class="text-sm text-[#6B6480]">{{ a.full_name }} · {{ a.phone }}</p>
+        <p class="text-sm text-[#6B6480]">{{ a.address_line }}, {{ a.city }}, {{ a.state }}</p>
+      </div>
+      <div class="flex gap-2 text-xs font-bold">
+        {% if not a.is_default %}
+        <form action="{{ url_for('main.address_set_default', address_id=a.id) }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="text-violet-600">Set Default</button>
+        </form>
+        {% endif %}
+        <form action="{{ url_for('main.address_delete', address_id=a.id) }}" method="POST" onsubmit="return confirm('Delete this address?');">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="text-rose-500">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div class="bg-white border border-dashed border-[#E7E3F5] rounded-2xl p-10 text-center text-sm text-[#6B6480]">No saved addresses yet.</div>
+    {% endfor %}
+  </div>
+
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+    <h3 class="font-bold text-sm mb-3">Add New Address</h3>
+    <form action="{{ url_for('main.address_add') }}" method="POST" class="grid md:grid-cols-2 gap-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input name="label" placeholder="Label (e.g. Home, Office)" class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+      <input name="full_name" placeholder="Full Name" required class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+      <input name="phone" placeholder="Phone Number" required class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+      <input name="city" placeholder="City" required class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+      <input name="state" placeholder="State" required class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 md:col-span-2">
+      <input name="address_line" placeholder="Street Address" required class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 md:col-span-2">
+      <button class="bg-violet-600 text-white font-semibold text-sm rounded-xl py-2.5 md:col-span-2">Save Address</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

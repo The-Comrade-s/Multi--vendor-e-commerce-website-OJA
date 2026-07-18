@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="max-w-[1000px] mx-auto px-5 py-6">
+  <h1 class="text-xl font-bold font-display mb-4">Checkout</h1>
+  <form method="POST" class="grid md:grid-cols-[1fr_300px] gap-6">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="space-y-5">
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+        <h3 class="font-bold text-sm mb-3"><i class="bi bi-geo-alt"></i> Delivery Address</h3>
+
+        {% if saved_addresses %}
+        <div class="grid gap-2 mb-4">
+          {% for a in saved_addresses %}
+          <label class="flex items-start gap-3 border border-[#E7E3F5] rounded-xl px-4 py-3 cursor-pointer has-[:checked]:ring-2 has-[:checked]:ring-violet-500">
+            <input type="radio" name="saved_address" value="{{ a.id }}" class="mt-1"
+              data-name="{{ a.full_name }}" data-phone="{{ a.phone }}" data-address="{{ a.address_line }}" data-city="{{ a.city }}" data-state="{{ a.state }}"
+              {{ 'checked' if a.is_default }} onchange="fillAddress(this)">
+            <span class="text-sm"><span class="font-bold">{{ a.label }}</span> — {{ a.full_name }}, {{ a.address_line }}, {{ a.city }}, {{ a.state }}</span>
+          </label>
+          {% endfor %}
+          <label class="flex items-center gap-3 border border-[#E7E3F5] rounded-xl px-4 py-3 cursor-pointer has-[:checked]:ring-2 has-[:checked]:ring-violet-500">
+            <input type="radio" name="saved_address" value="new" onchange="clearAddress()">
+            <span class="text-sm font-semibold">Use a new address</span>
+          </label>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="col-span-2"><label class="text-xs font-semibold mb-1.5 block">Full Name</label><input id="f_name" name="full_name" required value="{{ current_user.name }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+          <div><label class="text-xs font-semibold mb-1.5 block">Phone Number</label><input id="f_phone" name="phone" required value="{{ current_user.phone or '' }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+          <div><label class="text-xs font-semibold mb-1.5 block">State</label><input id="f_state" name="state" required placeholder="Lagos" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+          <div><label class="text-xs font-semibold mb-1.5 block">City</label><input id="f_city" name="city" required placeholder="Ikeja" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+          <div class="col-span-2"><label class="text-xs font-semibold mb-1.5 block">Street Address</label><input id="f_address" name="address" required placeholder="12 Allen Avenue, Opebi" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+          <label class="col-span-2 flex items-center gap-2 text-xs font-semibold text-[#6B6480]"><input type="checkbox" name="save_address" value="1"> Save this address for next time</label>
+        </div>
+      </div>
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+        <h3 class="font-bold text-sm mb-3"><i class="bi bi-credit-card"></i> Payment Method</h3>
+        <div class="space-y-2">
+          {% for value, label in [('card','Card Payment (Paystack/Flutterwave)'), ('bank_transfer','Bank Transfer'), ('pay_on_delivery','Pay on Delivery'), ('ussd','USSD')] %}
+          <label class="flex items-center gap-3 border border-[#E7E3F5] rounded-xl px-4 py-3 cursor-pointer has-[:checked]:ring-2 has-[:checked]:ring-violet-500">
+            <input type="radio" name="payment_method" value="{{ value }}" {{ 'checked' if loop.first }}>
+            <span class="text-sm font-semibold">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <p class="text-xs text-[#6B6480] mt-3">If no live payment gateway is configured yet, card payments run in demo mode and are marked paid instantly for testing.</p>
+      </div>
+    </div>
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5 h-fit">
+      <h3 class="font-bold font-display mb-4">Order Total</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span class="text-[#6B6480]">Items ({{ items|length }})</span><span class="font-mono">{{ subtotal | naira }}</span></div>
+        {% if coupon %}<div class="flex justify-between text-emerald-500"><span>Coupon ({{ coupon.code }})</span><span class="font-mono">-{{ discount | naira }}</span></div>{% endif %}
+        <div class="flex justify-between"><span class="text-[#6B6480]">Delivery</span><span class="font-mono {{ 'text-emerald-500' if delivery_fee == 0 }}">{{ 'Free' if delivery_fee == 0 else (delivery_fee | naira) }}</span></div>
+      </div>
+      <div class="border-t border-[#E7E3F5] mt-3 pt-3 flex justify-between font-bold"><span>Total</span><span class="font-mono">{{ total | naira }}</span></div>
+      <button type="submit" class="w-full mt-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl py-2.5">Place Order</button>
+    </div>
+  </form>
+</div>
+<script>
+  function fillAddress(input) {
+    document.getElementById('f_name').value = input.dataset.name;
+    document.getElementById('f_phone').value = input.dataset.phone;
+    document.getElementById('f_address').value = input.dataset.address;
+    document.getElementById('f_city').value = input.dataset.city;
+    document.getElementById('f_state').value = input.dataset.state;
+  }
+  function clearAddress() {
+    ['f_address','f_city','f_state'].forEach(id => document.getElementById(id).value = '');
+  }
+  {% if saved_addresses %}
+  window.addEventListener('DOMContentLoaded', () => {
+    const checked = document.querySelector('input[name="saved_address"]:checked');
+    if (checked && checked.value !== 'new') fillAddress(checked);
+  });
+  {% endif %}
+</script>
+{% endblock %}

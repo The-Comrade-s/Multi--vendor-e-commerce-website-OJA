@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Cart{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6">
+  <h1 class="text-xl font-bold font-display mb-4">Shopping Cart ({{ items|length }})</h1>
+
+  {% if items %}
+  <div class="grid lg:grid-cols-[1fr_340px] gap-6">
+    <div class="space-y-3">
+      {% for item in items %}
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-4 flex items-center gap-4">
+        <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center shrink-0">
+          <i class="bi {{ item.product.icon }} text-white text-xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <a href="{{ url_for('main.product_detail', slug=item.product.slug) }}" class="text-sm font-semibold truncate block hover:text-violet-600">{{ item.product.name }}</a>
+          <p class="text-xs text-[#6B6480]">{{ item.product.vendor.store_name }}{% if item.variant %} · {{ item.variant.name }}: {{ item.variant.value }}{% endif %}</p>
+          <p class="text-sm font-bold font-mono mt-1">{{ item.unit_price | naira }}</p>
+        </div>
+        <form action="{{ url_for('main.cart_update', item_id=item.id) }}" method="POST" class="flex items-center border border-[#E7E3F5] rounded-lg">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.available_stock }}" class="w-12 text-center text-xs font-bold py-1.5 outline-none" onchange="this.form.submit()">
+        </form>
+        <form action="{{ url_for('main.cart_remove', item_id=item.id) }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="text-rose-500"><i class="bi bi-trash3"></i></button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5 h-fit">
+      <h3 class="font-bold font-display mb-4">Order Summary</h3>
+
+      {% if coupon %}
+      <div class="bg-emerald-50 text-emerald-700 rounded-xl px-3 py-2 text-xs font-bold flex items-center justify-between mb-3">
+        <span><i class="bi bi-tag-fill"></i> {{ coupon.code }} applied ({{ coupon.discount_percent }}% off)</span>
+        <form action="{{ url_for('main.coupon_remove') }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="underline">Remove</button></form>
+      </div>
+      {% else %}
+      <form action="{{ url_for('main.coupon_apply') }}" method="POST" class="flex gap-2 mb-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input name="code" placeholder="Coupon code" class="flex-1 bg-[#F7F6FB] border border-[#E7E3F5] rounded-lg px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+        <button class="bg-violet-100 text-violet-700 text-xs font-bold rounded-lg px-3">Apply</button>
+      </form>
+      {% endif %}
+
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span class="text-[#6B6480]">Subtotal</span><span class="font-mono">{{ subtotal | naira }}</span></div>
+        {% if discount %}<div class="flex justify-between text-emerald-500"><span>Discount</span><span class="font-mono">-{{ discount | naira }}</span></div>{% endif %}
+        <div class="flex justify-between"><span class="text-[#6B6480]">Delivery</span><span class="font-mono {{ 'text-emerald-500' if delivery_fee == 0 }}">{{ 'Free' if delivery_fee == 0 else (delivery_fee | naira) }}</span></div>
+      </div>
+      <div class="border-t border-[#E7E3F5] mt-3 pt-3 flex justify-between font-bold"><span>Total</span><span class="font-mono">{{ total | naira }}</span></div>
+      <a href="{{ url_for('main.checkout') }}" class="block text-center mt-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl py-2.5">Proceed to Checkout <i class="bi bi-arrow-right"></i></a>
+    </div>
+  </div>
+  {% else %}
+  <div class="bg-white border border-dashed border-[#E7E3F5] rounded-2xl p-14 text-center">
+    <i class="bi bi-cart-x text-4xl text-[#6B6480]"></i>
+    <p class="text-sm text-[#6B6480] mt-3">Your cart is empty.</p>
+    <a href="{{ url_for('main.home') }}" class="inline-block mt-4 bg-violet-600 text-white text-sm font-semibold rounded-xl px-5 py-2.5">Start Shopping</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

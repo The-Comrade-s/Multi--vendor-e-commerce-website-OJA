@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Edit Product{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl p-6 max-w-2xl">
+    <h3 class="font-bold mb-4">Edit Product</h3>
+    <form method="POST" class="space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="md:col-span-2"><label class="text-xs font-semibold mb-1.5 block">Product Name</label><input name="name" required value="{{ product.name }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+        <div>
+          <label class="text-xs font-semibold mb-1.5 block">Category</label>
+          <select name="category_id" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+            {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if c.id == product.category_id }}>{{ c.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold mb-1.5 block">Status</label>
+          <select name="status" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+            {% for s in ['active','draft','archived'] %}<option value="{{ s }}" {{ 'selected' if s == product.status }}>{{ s|capitalize }}</option>{% endfor %}
+          </select>
+        </div>
+        <div><label class="text-xs font-semibold mb-1.5 block">Price (₦)</label><input name="price" type="number" step="0.01" value="{{ product.price }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+        <div><label class="text-xs font-semibold mb-1.5 block">Compare-at Price (₦)</label><input name="compare_at_price" type="number" step="0.01" value="{{ product.compare_at_price or '' }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+        <div><label class="text-xs font-semibold mb-1.5 block">Stock Quantity</label><input name="stock" type="number" value="{{ product.stock }}" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500"></div>
+      </div>
+      <div><label class="text-xs font-semibold mb-1.5 block">Description</label><textarea name="description" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 h-24">{{ product.description or '' }}</textarea></div>
+      <div class="flex gap-3">
+        <button type="submit" class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl px-5 py-2.5">Save Changes</button>
+        <a href="{{ url_for('vendor.products') }}" class="border border-[#E7E3F5] rounded-xl px-5 py-2.5 font-semibold text-sm">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

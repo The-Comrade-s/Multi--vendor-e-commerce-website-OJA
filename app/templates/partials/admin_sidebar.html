@@ -1,0 +1,26 @@
+{% set nav = [
+  ('admin.dashboard', 'bi-grid-1x2', 'Dashboard'),
+  ('admin.vendors', 'bi-shop', 'Vendors'),
+  ('admin.users', 'bi-people', 'Users'),
+  ('admin.products', 'bi-box-seam', 'Products'),
+  ('admin.categories', 'bi-tags', 'Categories'),
+  ('admin.returns', 'bi-arrow-return-left', 'Returns'),
+  ('admin.coupons', 'bi-tag', 'Coupons'),
+  ('admin.reports', 'bi-bar-chart', 'Reports'),
+] %}
+<div class="bg-white border border-[#E7E3F5] rounded-2xl p-3 h-fit md:sticky md:top-20">
+  <div class="px-2 py-2 mb-2">
+    <p class="text-xs font-bold">Super Admin</p>
+    <p class="text-[11px] text-[#6B6480]">Platform Control</p>
+  </div>
+  <nav class="space-y-0.5">
+    {% for endpoint, icon, label in nav %}
+    <a href="{{ url_for(endpoint) }}" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors {{ 'bg-violet-600 text-white' if request.endpoint == endpoint else 'text-[#6B6480] hover:bg-[#F1EEFB]' }}">
+      <i class="bi {{ icon }}"></i> {{ label }}
+    </a>
+    {% endfor %}
+  </nav>
+  <div class="border-t border-[#E7E3F5] mt-2 pt-2">
+    <a href="{{ url_for('auth.logout') }}" class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#6B6480] hover:bg-[#F1EEFB]"><i class="bi bi-box-arrow-right"></i> Log Out</a>
+  </div>
+</div>

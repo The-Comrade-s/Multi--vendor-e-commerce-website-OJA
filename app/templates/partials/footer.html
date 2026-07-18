@@ -1,0 +1,33 @@
+<footer class="border-t border-[#E7E3F5] bg-white mt-16">
+  <div class="max-w-[1400px] mx-auto px-5 py-10 grid md:grid-cols-4 gap-8 text-sm">
+    <div>
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-bold font-display text-sm">O</div>
+        <span class="font-bold font-display">OJÀ<span class="text-violet-600">.</span></span>
+      </div>
+      <p class="text-[#6B6480]">Nigeria's multi-vendor marketplace — genuine products, verified vendors, secure payments.</p>
+    </div>
+    <div>
+      <p class="font-bold mb-2">Shop</p>
+      <ul class="space-y-1.5 text-[#6B6480]">
+        <li><a href="{{ url_for('main.home') }}" class="hover:text-violet-600">Home</a></li>
+        <li><a href="{{ url_for('main.search') }}" class="hover:text-violet-600">Search</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="font-bold mb-2">Sell on OJÀ</p>
+      <ul class="space-y-1.5 text-[#6B6480]">
+        <li><a href="{{ url_for('auth.register') }}" class="hover:text-violet-600">Become a Vendor</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="font-bold mb-2">Support</p>
+      <ul class="space-y-1.5 text-[#6B6480]">
+        <li><i class="bi bi-shield-check"></i> Secure Payment</li>
+        <li><i class="bi bi-arrow-repeat"></i> Easy Returns</li>
+        <li><i class="bi bi-headset"></i> 24/7 Support</li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-[#E7E3F5] py-4 text-center text-xs text-[#6B6480]">© 2026 OJÀ Marketplace. Built for the HND final-year project.</div>
+</footer>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Reviews{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div class="space-y-3">
+    {% for r in reviews %}
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-bold">{{ r.product.name }}</p>
+          <p class="text-xs text-[#6B6480]">by {{ r.user.name }} · {{ r.created_at.strftime('%b %d, %Y') }}</p>
+        </div>
+        <div class="flex items-center gap-0.5">
+          {% for i in range(1,6) %}<i class="bi {{ 'bi-star-fill text-amber-400' if i <= r.rating else 'bi-star text-gray-300' }} text-xs"></i>{% endfor %}
+        </div>
+      </div>
+      <p class="text-sm text-[#6B6480] mt-2">{{ r.comment }}</p>
+
+      {% if r.reply %}
+      <div class="bg-[#F7F6FB] rounded-xl p-3 mt-3">
+        <p class="text-xs font-bold text-violet-700">Your reply</p>
+        <p class="text-xs text-[#6B6480] mt-0.5">{{ r.reply.message }}</p>
+      </div>
+      {% else %}
+      <form action="{{ url_for('vendor.reply_review', review_id=r.id) }}" method="POST" class="flex gap-2 mt-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input name="message" placeholder="Reply to this review..." required class="flex-1 bg-[#F7F6FB] border border-[#E7E3F5] rounded-lg px-3 py-2 text-xs">
+        <button class="bg-violet-600 text-white text-xs font-bold rounded-lg px-3">Reply</button>
+      </form>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="bg-white border border-dashed border-[#E7E3F5] rounded-2xl p-10 text-center text-sm text-[#6B6480]">No reviews on your products yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

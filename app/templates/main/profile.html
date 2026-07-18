@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-5 py-6">
+  <h1 class="text-xl font-bold font-display mb-4">My Profile</h1>
+
+  {% if not current_user.is_email_verified %}
+  <div class="bg-amber-50 text-amber-700 rounded-2xl px-4 py-3 text-sm font-semibold flex items-center justify-between mb-4">
+    <span><i class="bi bi-envelope-exclamation"></i> Your email isn't verified yet.</span>
+    <a href="{{ url_for('auth.resend_verification') }}" class="underline">Resend link</a>
+  </div>
+  {% endif %}
+
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl p-6 flex items-center gap-4">
+    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-white flex items-center justify-center text-2xl font-bold font-display">{{ current_user.name[0] }}</div>
+    <div>
+      <p class="font-bold text-lg">{{ current_user.name }}</p>
+      <p class="text-sm text-[#6B6480]">{{ current_user.email }} {% if current_user.is_email_verified %}<i class="bi bi-patch-check-fill text-blue-500"></i>{% endif %}</p>
+      <p class="text-sm text-[#6B6480]">{{ current_user.phone or "No phone number on file" }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4 mt-5">
+    <a href="{{ url_for('main.orders') }}" class="bg-white border border-[#E7E3F5] rounded-2xl p-5 hover:shadow-md transition-all">
+      <i class="bi bi-bag-check text-violet-600 text-xl"></i>
+      <p class="font-bold mt-2">My Orders</p>
+      <p class="text-xs text-[#6B6480]">Track and review past purchases</p>
+    </a>
+    <a href="{{ url_for('main.wishlist') }}" class="bg-white border border-[#E7E3F5] rounded-2xl p-5 hover:shadow-md transition-all">
+      <i class="bi bi-heart text-violet-600 text-xl"></i>
+      <p class="font-bold mt-2">Wishlist</p>
+      <p class="text-xs text-[#6B6480]">Products you've saved for later</p>
+    </a>
+    <a href="{{ url_for('main.addresses') }}" class="bg-white border border-[#E7E3F5] rounded-2xl p-5 hover:shadow-md transition-all">
+      <i class="bi bi-geo-alt text-violet-600 text-xl"></i>
+      <p class="font-bold mt-2">Addresses</p>
+      <p class="text-xs text-[#6B6480]">Manage delivery addresses</p>
+    </a>
+    <a href="{{ url_for('main.my_returns') }}" class="bg-white border border-[#E7E3F5] rounded-2xl p-5 hover:shadow-md transition-all">
+      <i class="bi bi-arrow-return-left text-violet-600 text-xl"></i>
+      <p class="font-bold mt-2">Returns</p>
+      <p class="text-xs text-[#6B6480]">Track return & refund requests</p>
+    </a>
+  </div>
+
+  <p class="text-xs text-[#6B6480] mt-6">Member since {{ current_user.created_at.strftime('%B %Y') }}</p>
+</div>
+{% endblock %}

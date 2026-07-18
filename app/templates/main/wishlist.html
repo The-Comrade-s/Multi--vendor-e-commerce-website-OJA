@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Wishlist{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6">
+  <h1 class="text-xl font-bold font-display mb-4">My Wishlist</h1>
+  {% if items %}
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {% for item in items %}{{ m.product_card(item.product) }}{% endfor %}
+  </div>
+  {% else %}
+  <div class="bg-white border border-dashed border-[#E7E3F5] rounded-2xl p-14 text-center text-sm text-[#6B6480]">Your wishlist is empty.</div>
+  {% endif %}
+</div>
+{% endblock %}

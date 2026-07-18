@@ -1,0 +1,43 @@
+<div class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-[#E7E3F5]">
+  <div class="max-w-[1400px] mx-auto px-5 py-3 flex items-center justify-between gap-4">
+    <a href="{{ url_for('main.home') }}" class="flex items-center gap-2 shrink-0">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-bold font-display">O</div>
+      <span class="font-bold font-display text-lg tracking-tight">OJÀ<span class="text-violet-600">.</span></span>
+    </a>
+
+    <form action="{{ url_for('main.search') }}" method="get" class="hidden md:flex flex-1 max-w-md relative">
+      <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6480] text-sm"></i>
+      <input name="q" type="text" placeholder="Search for products, vendors, categories..." class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+    </form>
+
+    <div class="flex items-center gap-4 text-sm font-semibold">
+      {% if current_user.is_authenticated and current_user.is_customer %}
+        <a href="{{ url_for('main.notifications') }}" class="relative text-[#6B6480] hover:text-violet-600">
+          <i class="bi bi-bell text-lg"></i>
+          {% if unread_notifications %}<span class="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">{{ unread_notifications }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('main.wishlist') }}" class="text-[#6B6480] hover:text-violet-600"><i class="bi bi-heart text-lg"></i></a>
+        <a href="{{ url_for('main.cart') }}" class="relative text-[#6B6480] hover:text-violet-600">
+          <i class="bi bi-cart3 text-lg"></i>
+          {% if cart_count %}<span class="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">{{ cart_count }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('main.orders') }}" class="hidden sm:inline text-[#6B6480] hover:text-violet-600">Orders</a>
+        <a href="{{ url_for('main.profile') }}" class="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center text-xs font-bold">{{ current_user.name[0] }}</a>
+        <a href="{{ url_for('auth.logout') }}" class="text-[#6B6480] hover:text-rose-600" title="Log out"><i class="bi bi-box-arrow-right text-lg"></i></a>
+      {% elif current_user.is_authenticated and current_user.is_vendor %}
+        <a href="{{ url_for('main.notifications') }}" class="relative text-[#6B6480] hover:text-violet-600">
+          <i class="bi bi-bell text-lg"></i>
+          {% if unread_notifications %}<span class="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">{{ unread_notifications }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('vendor.dashboard') }}" class="text-violet-600">Vendor Dashboard</a>
+        <a href="{{ url_for('auth.logout') }}" class="text-[#6B6480] hover:text-rose-600"><i class="bi bi-box-arrow-right text-lg"></i></a>
+      {% elif current_user.is_authenticated and current_user.is_admin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="text-violet-600">Admin Dashboard</a>
+        <a href="{{ url_for('auth.logout') }}" class="text-[#6B6480] hover:text-rose-600"><i class="bi bi-box-arrow-right text-lg"></i></a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="text-[#6B6480] hover:text-violet-600">Log In</a>
+        <a href="{{ url_for('auth.register') }}" class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-4 py-2 rounded-xl">Sign Up</a>
+      {% endif %}
+    </div>
+  </div>
+</div>

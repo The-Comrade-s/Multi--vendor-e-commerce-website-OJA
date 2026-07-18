@@ -1,0 +1,11 @@
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar { height: 6px; width: 6px; }
+::-webkit-scrollbar-thumb { background: #C9C0EA; border-radius: 999px; }
+
+.product-card:hover .quick-actions { opacity: 1; }

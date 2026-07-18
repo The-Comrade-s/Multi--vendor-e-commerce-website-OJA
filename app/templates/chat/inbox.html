@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+{% block content %}
+{% if current_user.is_vendor %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden">
+    {% include "chat/_list.html" %}
+  </div>
+</div>
+{% else %}
+<div class="max-w-2xl mx-auto px-5 py-6">
+  <h1 class="text-xl font-bold font-display mb-4">Messages</h1>
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden">
+    {% include "chat/_list.html" %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

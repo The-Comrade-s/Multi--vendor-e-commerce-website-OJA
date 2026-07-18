@@ -1,0 +1,30 @@
+<div class="bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden flex flex-col h-[520px]">
+  <div class="p-4 border-b border-[#E7E3F5]">
+    <p class="font-bold text-sm">{{ convo.customer.name if is_vendor_party else convo.vendor.store_name }}</p>
+  </div>
+  <div class="flex-1 overflow-y-auto p-4 space-y-3">
+    {% for msg in messages %}
+      {% set is_mine = (msg.sender_role == 'vendor' and is_vendor_party) or (msg.sender_role == 'customer' and not is_vendor_party) %}
+      <div class="flex {{ 'justify-end' if is_mine else 'justify-start' }}">
+        <div class="max-w-[70%] {{ 'bg-violet-600 text-white' if is_mine else 'bg-[#F1EEFB] text-[#1B1330]' }} rounded-2xl px-4 py-2 text-sm">
+          {% if msg.image_filename %}
+          <img src="{{ url_for('static', filename='uploads/' + msg.image_filename) }}" class="rounded-xl mb-1 max-w-full">
+          {% endif %}
+          {% if msg.body %}{{ msg.body }}{% endif %}
+          <p class="text-[10px] {{ 'text-violet-200' if is_mine else 'text-[#6B6480]' }} mt-1">{{ msg.created_at.strftime('%I:%M %p') }}</p>
+        </div>
+      </div>
+    {% else %}
+      <p class="text-sm text-[#6B6480] text-center mt-10">Say hello 👋</p>
+    {% endfor %}
+  </div>
+  <form action="{{ url_for('chat.thread', conversation_id=convo.id) }}" method="POST" enctype="multipart/form-data" class="border-t border-[#E7E3F5] p-3 flex gap-2 items-center">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="cursor-pointer text-[#6B6480]">
+      <input type="file" name="image" accept="image/*" class="hidden" onchange="this.form.querySelector('button').click()">
+      <i class="bi bi-image text-lg"></i>
+    </label>
+    <input name="body" placeholder="Type a message..." class="flex-1 bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+    <button class="bg-violet-600 text-white rounded-xl px-4 py-2.5"><i class="bi bi-send"></i></button>
+  </form>
+</div>

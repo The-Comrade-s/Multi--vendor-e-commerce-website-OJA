@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}My Returns{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-5 py-6">
+  <h1 class="text-xl font-bold font-display mb-4">Return & Refund Requests</h1>
+  <div class="space-y-3">
+    {% for r in returns %}
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-4">
+      <div class="flex items-center justify-between">
+        <p class="text-sm font-semibold">{{ r.order_item.product_name }}</p>
+        {% set toneclass = {'requested':'bg-amber-100 text-amber-700','approved':'bg-blue-100 text-blue-700','rejected':'bg-rose-100 text-rose-700','refunded':'bg-emerald-100 text-emerald-700'}[r.status] %}
+        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold {{ toneclass }}">{{ r.status|capitalize }}</span>
+      </div>
+      <p class="text-xs text-[#6B6480] mt-1">Reason: {{ r.reason }}</p>
+      {% if r.details %}<p class="text-xs text-[#6B6480]">{{ r.details }}</p>{% endif %}
+      <p class="text-xs text-[#6B6480] mt-1">Requested {{ r.created_at.strftime('%b %d, %Y') }}
+        {% if r.refund_amount %} · Refund: {{ r.refund_amount | naira }}{% endif %}</p>
+    </div>
+    {% else %}
+    <div class="bg-white border border-dashed border-[#E7E3F5] rounded-2xl p-10 text-center text-sm text-[#6B6480]">No return requests yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

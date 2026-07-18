@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden">
+    <div class="p-5"><h3 class="font-bold">Orders containing your products</h3></div>
+    {% if orders %}
+    <table class="w-full text-sm">
+      <thead><tr class="text-xs uppercase tracking-wide text-[#6B6480]">
+        <th class="text-left font-semibold px-5 py-2">Order ID</th><th class="text-left font-semibold px-5 py-2">Customer</th>
+        <th class="text-left font-semibold px-5 py-2">Total</th><th class="text-left font-semibold px-5 py-2">Status</th>
+      </tr></thead>
+      <tbody>
+        {% for o in orders %}
+        <tr class="border-t border-[#E7E3F5]">
+          <td class="px-5 py-3 font-mono font-semibold">#{{ o.order_number }}</td>
+          <td class="px-5 py-3">{{ o.full_name }}</td>
+          <td class="px-5 py-3 font-mono">{{ o.total | naira }}</td>
+          <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600">{{ o.status|capitalize }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-sm text-[#6B6480] px-5 pb-8">No orders yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

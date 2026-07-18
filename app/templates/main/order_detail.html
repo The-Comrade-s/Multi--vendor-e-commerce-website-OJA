@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="max-w-[900px] mx-auto px-5 py-6">
+  <div class="flex items-center justify-between mb-1">
+    <h1 class="text-xl font-bold font-display">Order #{{ order.order_number }}</h1>
+    <a href="{{ url_for('payments.receipt', order_number=order.order_number) }}" target="_blank" class="text-xs font-bold text-violet-600"><i class="bi bi-receipt"></i> View Receipt</a>
+  </div>
+  <p class="text-sm text-[#6B6480] mb-6">Placed on {{ order.created_at.strftime('%B %d, %Y') }}</p>
+
+  {% if order.status != 'cancelled' %}
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl p-6 mb-6">
+    <div class="flex items-center justify-between">
+      {% set steps = ['pending','processing','shipped','out_for_delivery','delivered'] %}
+      {% set icons = {'pending':'bi-bag-check','processing':'bi-gear','shipped':'bi-truck','out_for_delivery':'bi-geo-alt','delivered':'bi-box-seam'} %}
+      {% set labels = {'pending':'Placed','processing':'Processed','shipped':'Shipped','out_for_delivery':'Out for Delivery','delivered':'Delivered'} %}
+      {% set current_index = steps.index(order.status) if order.status in steps else 0 %}
+      {% for s in steps %}
+        {% set done = loop.index0 <= current_index %}
+        <div class="flex flex-col items-center gap-1.5 flex-1">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center {{ 'bg-violet-600 text-white' if done else 'bg-[#F1EEFB] text-[#6B6480]' }}"><i class="bi {{ icons[s] }}"></i></div>
+          <span class="text-[10px] font-semibold text-center">{{ labels[s] }}</span>
+        </div>
+        {% if not loop.last %}<div class="h-0.5 flex-1 -mt-5 {{ 'bg-violet-600' if loop.index0 < current_index else 'bg-[#F1EEFB]' }}"></div>{% endif %}
+      {% endfor %}
+    </div>
+
+    {% if timeline %}
+    <div class="border-t border-[#E7E3F5] mt-5 pt-4 space-y-2">
+      {% for t in timeline %}
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-semibold capitalize">{{ t.status.replace('_',' ') }}{% if t.note %} — {{ t.note }}{% endif %}</span>
+        <span class="text-[#6B6480]">{{ t.created_at.strftime('%b %d, %I:%M %p') }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="bg-rose-50 text-rose-700 rounded-2xl p-4 mb-6 text-sm font-semibold"><i class="bi bi-x-circle"></i> This order was cancelled.</div>
+  {% endif %}
+
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5 mb-6">
+    <h3 class="font-bold text-sm mb-3">Items</h3>
+    <div class="space-y-4">
+      {% for item in order.items %}
+      <div class="flex items-center justify-between text-sm border-b border-[#E7E3F5] last:border-0 pb-3 last:pb-0">
+        <div>
+          <p>{{ item.product_name }} × {{ item.quantity }}</p>
+          {% if order.status == 'delivered' %}
+            <form action="{{ url_for('main.request_return', order_item_id=item.id) }}" method="POST" class="flex items-center gap-2 mt-1.5">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <select name="reason" class="text-[11px] border border-[#E7E3F5] rounded-lg px-2 py-1">
+                <option value="">Reason for return...</option>
+                <option>Damaged item</option>
+                <option>Wrong item received</option>
+                <option>Not as described</option>
+                <option>Changed my mind</option>
+              </select>
+              <button class="text-[11px] font-bold text-rose-500">Request Return</button>
+            </form>
+          {% endif %}
+        </div>
+        <span class="font-mono">{{ item.line_total | naira }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="border-t border-[#E7E3F5] mt-3 pt-3 space-y-1 text-sm">
+      <div class="flex justify-between"><span class="text-[#6B6480]">Subtotal</span><span class="font-mono">{{ order.subtotal | naira }}</span></div>
+      {% if order.discount_amount %}<div class="flex justify-between text-emerald-500"><span>Discount ({{ order.coupon_code }})</span><span class="font-mono">-{{ order.discount_amount | naira }}</span></div>{% endif %}
+      <div class="flex justify-between"><span class="text-[#6B6480]">Delivery</span><span class="font-mono">{{ 'Free' if order.delivery_fee == 0 else (order.delivery_fee | naira) }}</span></div>
+      <div class="flex justify-between font-bold"><span>Total</span><span class="font-mono">{{ order.total | naira }}</span></div>
+    </div>
+  </div>
+
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+    <h3 class="font-bold text-sm mb-2">Delivery Address</h3>
+    <p class="text-sm text-[#6B6480]">{{ order.full_name }} · {{ order.phone }}</p>
+    <p class="text-sm text-[#6B6480]">{{ order.address }}, {{ order.city }}, {{ order.state }}</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}All Products{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/admin_sidebar.html" %}
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden">
+    <div class="p-5"><h3 class="font-bold">All Products ({{ products|length }})</h3></div>
+    {% if products %}
+    <table class="w-full text-sm">
+      <thead><tr class="text-xs uppercase tracking-wide text-[#6B6480]">
+        <th class="text-left font-semibold px-5 py-2">Product</th><th class="text-left font-semibold px-5 py-2">Vendor</th>
+        <th class="text-left font-semibold px-5 py-2">Price</th><th class="text-left font-semibold px-5 py-2">Status</th><th class="px-5 py-2"></th>
+      </tr></thead>
+      <tbody>
+        {% for p in products %}
+        <tr class="border-t border-[#E7E3F5]">
+          <td class="px-5 py-3 flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center"><i class="bi {{ p.icon }} text-white text-sm"></i></div>
+            <span class="font-semibold text-xs">{{ p.name }}</span>
+          </td>
+          <td class="px-5 py-3">{{ p.vendor.store_name }}</td>
+          <td class="px-5 py-3 font-mono">{{ p.price | naira }}</td>
+          <td class="px-5 py-3">
+            {% set toneclass = {'active':'bg-emerald-100 text-emerald-700','draft':'bg-gray-100 text-gray-600','archived':'bg-rose-100 text-rose-700'}[p.status] %}
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold {{ toneclass }}">{{ p.status|capitalize }}</span>
+          </td>
+          <td class="px-5 py-3">
+            <form action="{{ url_for('admin.delist_product', product_id=p.id) }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="text-xs font-bold text-rose-500">{{ 'Re-list' if p.status == 'archived' else 'Delist' }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-sm text-[#6B6480] px-5 pb-8">No products on the platform yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

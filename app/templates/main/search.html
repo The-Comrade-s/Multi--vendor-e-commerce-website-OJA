@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6">
+  <form method="get" class="max-w-lg mb-6 relative">
+    <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6B6480] text-sm"></i>
+    <input name="q" value="{{ query }}" placeholder="Search for products..." class="w-full bg-white border border-[#E7E3F5] rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+  </form>
+
+  {% if query %}
+    <p class="text-sm text-[#6B6480] mb-4">{{ results|length }} results for "<span class="font-semibold text-[#1B1330]">{{ query }}</span>"</p>
+    {% if results %}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {% for p in results %}{{ m.product_card(p) }}{% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white border border-dashed border-[#E7E3F5] rounded-2xl p-10 text-center text-[#6B6480] text-sm">No products matched your search.</div>
+    {% endif %}
+  {% else %}
+    <p class="text-sm text-[#6B6480]">Type something to search the marketplace.</p>
+  {% endif %}
+</div>
+{% endblock %}

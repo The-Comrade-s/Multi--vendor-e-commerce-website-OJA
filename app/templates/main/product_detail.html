@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6">
+  <p class="text-xs text-[#6B6480] mb-4">
+    <a href="{{ url_for('main.home') }}" class="hover:text-violet-600">Home</a> <i class="bi bi-chevron-right text-[9px]"></i>
+    <a href="{{ url_for('main.category', slug=product.category.slug) }}" class="hover:text-violet-600">{{ product.category.name }}</a> <i class="bi bi-chevron-right text-[9px]"></i>
+    <span class="font-semibold text-violet-600">{{ product.name }}</span>
+  </p>
+
+  {% if product.is_flash_sale_active %}
+  <div class="bg-amber-50 text-amber-700 rounded-xl px-4 py-2.5 text-sm font-bold mb-4 inline-flex items-center gap-2">
+    <i class="bi bi-lightning-charge-fill"></i> Flash Sale ends {{ product.flash_sale_ends_at.strftime('%b %d, %I:%M %p') if product.flash_sale_ends_at else 'soon' }}
+  </div>
+  {% endif %}
+
+  <div class="grid lg:grid-cols-2 gap-8">
+    <div>
+      {% if images %}
+      <div class="h-96 rounded-3xl overflow-hidden bg-[#F1EEFB]">
+        <img src="{{ url_for('static', filename='uploads/' + images[0].filename) }}" class="w-full h-full object-cover" alt="{{ product.name }}">
+      </div>
+      {% if images|length > 1 %}
+      <div class="flex gap-2 mt-3">
+        {% for img in images %}
+        <img src="{{ url_for('static', filename='uploads/' + img.filename) }}" class="w-16 h-16 rounded-xl object-cover border-2 {{ 'border-violet-600' if loop.first else 'border-transparent' }}">
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="h-96 rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center">
+        <i class="bi {{ product.icon }} text-white/90" style="font-size:6rem;"></i>
+      </div>
+      {% endif %}
+    </div>
+
+    <div>
+      <h1 class="text-2xl font-bold font-display">{{ product.name }}</h1>
+      <div class="flex items-center gap-2 mt-2">
+        {{ m.stars(product.avg_rating) }}
+        <span class="text-sm font-semibold">{{ product.avg_rating }}</span>
+        <span class="text-sm text-[#6B6480]">({{ product.review_count }} reviews)</span>
+      </div>
+      <div class="flex items-baseline gap-2 mt-4">
+        <span class="text-3xl font-bold font-mono">{{ product.price | naira }}</span>
+        {% if product.compare_at_price %}
+          <span class="line-through text-[#6B6480]">{{ product.compare_at_price | naira }}</span>
+          <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">-{{ product.discount_percent }}%</span>
+        {% endif %}
+      </div>
+      <p class="text-sm mt-4 text-[#6B6480] whitespace-pre-line">{{ product.description or "No description provided by the vendor yet." }}</p>
+
+      {% if current_user.is_authenticated and current_user.is_customer %}
+      <form action="{{ url_for('main.cart_add', product_id=product.id) }}" method="POST" class="mt-5 space-y-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if variants %}
+        <div>
+          <label class="text-xs font-semibold mb-1.5 block">{{ variants[0].name }}</label>
+          <select name="variant_id" class="w-full border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm">
+            {% for v in variants %}
+            <option value="{{ v.id }}" {{ 'disabled' if v.stock == 0 }}>{{ v.value }} — {{ v.effective_price | naira }}{{ ' (out of stock)' if v.stock == 0 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <div class="flex items-center gap-3">
+          <input type="number" name="quantity" value="1" min="1" class="w-16 border border-[#E7E3F5] rounded-xl text-center text-sm py-2">
+          <button {{ 'disabled' if product.total_stock == 0 }} class="flex-1 bg-gradient-to-r from-violet-600 to-indigo-600 disabled:opacity-40 text-white font-semibold rounded-xl py-2.5"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+        </div>
+      </form>
+      <form action="{{ url_for('main.wishlist_toggle', product_id=product.id) }}" method="POST" class="mt-2">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="text-xs font-semibold text-violet-600"><i class="bi {{ 'bi-heart-fill' if in_wishlist else 'bi-heart' }}"></i> {{ 'In Wishlist' if in_wishlist else 'Add to Wishlist' }}</button>
+      </form>
+      {% else %}
+      <a href="{{ url_for('auth.login') }}" class="block text-center mt-5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl py-2.5">Log in to Purchase</a>
+      {% endif %}
+
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-4 mt-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center font-bold">{{ product.vendor.store_name[0] }}</div>
+          <div>
+            <p class="text-sm font-bold flex items-center gap-1">{{ product.vendor.store_name }}
+              {% if product.vendor.is_verified %}<i class="bi bi-patch-check-fill text-blue-500 text-xs"></i>{% endif %}
+            </p>
+            <p class="text-xs text-[#6B6480]">{{ product.vendor.city }}, {{ product.vendor.state }}</p>
+          </div>
+        </div>
+        {% if current_user.is_authenticated and current_user.is_customer %}
+        <form action="{{ url_for('chat.start', vendor_id=product.vendor.id) }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="border border-violet-200 text-violet-700 text-xs font-bold rounded-xl px-3 py-2"><i class="bi bi-chat-dots"></i> Chat</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if related %}
+  <div class="mt-10">
+    <h2 class="font-bold font-display mb-4">You may also like</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">{% for p in related %}{{ m.product_card(p) }}{% endfor %}</div>
+  </div>
+  {% endif %}
+
+  <div class="mt-10 max-w-2xl">
+    <h2 class="font-bold font-display mb-4">Reviews ({{ product.review_count }})</h2>
+    {% if current_user.is_authenticated and current_user.is_customer %}
+    <form action="{{ url_for('main.add_review', slug=product.slug) }}" method="POST" class="bg-white border border-[#E7E3F5] rounded-2xl p-4 mb-4 space-y-2">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <select name="rating" class="border border-[#E7E3F5] rounded-lg px-3 py-1.5 text-sm">
+        {% for i in range(5,0,-1) %}<option value="{{ i }}">{{ i }} star{{ 's' if i != 1 }}</option>{% endfor %}
+      </select>
+      <textarea name="comment" placeholder="Share your experience with this product..." class="w-full border border-[#E7E3F5] rounded-xl px-3 py-2 text-sm h-20"></textarea>
+      <button class="bg-violet-600 text-white text-xs font-bold rounded-lg px-4 py-2">Submit Review</button>
+    </form>
+    {% endif %}
+    <div class="space-y-3">
+      {% for r in reviews %}
+      <div class="bg-white border border-[#E7E3F5] rounded-2xl p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold">{{ r.user.name }}</span>
+          {{ m.stars(r.rating) }}
+        </div>
+        <p class="text-sm text-[#6B6480] mt-1">{{ r.comment }}</p>
+        {% if r.reply %}
+        <div class="bg-[#F7F6FB] rounded-xl p-3 mt-2 ml-4">
+          <p class="text-xs font-bold text-violet-700"><i class="bi bi-shop"></i> {{ product.vendor.store_name }} replied</p>
+          <p class="text-xs text-[#6B6480] mt-0.5">{{ r.reply.message }}</p>
+        </div>
+        {% endif %}
+      </div>
+      {% else %}
+      <p class="text-sm text-[#6B6480]">No reviews yet — be the first to review this product.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

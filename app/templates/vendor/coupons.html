@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Coupons{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/vendor_sidebar.html" %}
+  <div class="space-y-5">
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl p-5">
+      <h3 class="font-bold text-sm mb-3">Create Coupon</h3>
+      <form method="POST" class="grid md:grid-cols-4 gap-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input name="code" placeholder="CODE10" required class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500 uppercase">
+        <input name="discount_percent" type="number" placeholder="Discount %" required class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+        <input name="usage_limit" type="number" placeholder="Usage limit (optional)" class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+        <input name="expires_days" type="number" placeholder="Expires in (days)" class="bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+        <button class="bg-violet-600 text-white text-sm font-bold rounded-xl py-2.5 md:col-span-4">Create Coupon</button>
+      </form>
+    </div>
+    <div class="bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden">
+      <div class="p-5"><h3 class="font-bold text-sm">Your Coupons</h3></div>
+      {% if coupons %}
+      <table class="w-full text-sm">
+        <thead><tr class="text-xs uppercase tracking-wide text-[#6B6480]"><th class="text-left px-5 py-2">Code</th><th class="text-left px-5 py-2">Discount</th><th class="text-left px-5 py-2">Used</th><th class="text-left px-5 py-2">Status</th><th class="px-5 py-2"></th></tr></thead>
+        <tbody>
+          {% for c in coupons %}
+          <tr class="border-t border-[#E7E3F5]">
+            <td class="px-5 py-3 font-mono font-bold">{{ c.code }}</td>
+            <td class="px-5 py-3">{{ c.discount_percent }}%</td>
+            <td class="px-5 py-3">{{ c.times_used }}{% if c.usage_limit %} / {{ c.usage_limit }}{% endif %}</td>
+            <td class="px-5 py-3">
+              {% if c.is_valid %}<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700">Active</span>
+              {% else %}<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-gray-100 text-gray-600">Inactive</span>{% endif %}
+            </td>
+            <td class="px-5 py-3">
+              <form action="{{ url_for('vendor.toggle_coupon', coupon_id=c.id) }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="text-xs font-bold text-violet-600">{{ 'Deactivate' if c.active else 'Activate' }}</button></form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="text-sm text-[#6B6480] px-5 pb-6">No coupons yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

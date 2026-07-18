@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto px-5 py-16">
+  <h1 class="text-2xl font-bold font-display text-center mb-1">Join OJÀ</h1>
+  <p class="text-center text-[#6B6480] text-sm mb-6">Create your account to start shopping or selling</p>
+
+  <form method="POST" class="bg-white border border-[#E7E3F5] rounded-2xl p-6 space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="flex gap-2 bg-[#F1EEFB] rounded-full p-1">
+      <label class="flex-1">
+        <input type="radio" name="role" value="customer" checked class="peer hidden">
+        <div class="text-center text-xs font-bold py-2 rounded-full cursor-pointer peer-checked:bg-violet-600 peer-checked:text-white text-[#6B6480]">I'm shopping</div>
+      </label>
+      <label class="flex-1">
+        <input type="radio" name="role" value="vendor" class="peer hidden">
+        <div class="text-center text-xs font-bold py-2 rounded-full cursor-pointer peer-checked:bg-violet-600 peer-checked:text-white text-[#6B6480]">I'm selling</div>
+      </label>
+    </div>
+
+    <div>
+      <label class="text-xs font-semibold mb-1.5 block">Full Name</label>
+      <input type="text" name="name" required class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+    </div>
+    <div>
+      <label class="text-xs font-semibold mb-1.5 block">Email Address</label>
+      <input type="email" name="email" required class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+    </div>
+    <div>
+      <label class="text-xs font-semibold mb-1.5 block">Phone Number</label>
+      <input type="text" name="phone" placeholder="080X XXX XXXX" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+    </div>
+    <div id="store-field" class="hidden">
+      <label class="text-xs font-semibold mb-1.5 block">Store Name</label>
+      <input type="text" name="store_name" placeholder="e.g. TechHub Lagos" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+    </div>
+    <div>
+      <label class="text-xs font-semibold mb-1.5 block">Password</label>
+      <input type="password" name="password" required minlength="6" class="w-full bg-[#F7F6FB] border border-[#E7E3F5] rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-violet-500">
+    </div>
+    <button type="submit" class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl py-2.5">Create Account</button>
+  </form>
+
+  <p class="text-center text-sm text-[#6B6480] mt-4">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-violet-600 font-semibold">Log in</a></p>
+</div>
+<script>
+  const radios = document.querySelectorAll('input[name="role"]');
+  const storeField = document.getElementById('store-field');
+  radios.forEach(r => r.addEventListener('change', () => {
+    storeField.classList.toggle('hidden', r.value !== 'vendor' || !r.checked);
+  }));
+</script>
+{% endblock %}

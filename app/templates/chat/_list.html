@@ -1,0 +1,20 @@
+{% if conversations %}
+<div class="divide-y divide-[#E7E3F5]">
+  {% for c in conversations %}
+  <a href="{{ url_for('chat.thread', conversation_id=c.id) }}" class="flex items-center gap-3 p-4 hover:bg-[#F7F6FB]">
+    <div class="w-10 h-10 rounded-full bg-violet-600 text-white flex items-center justify-center font-bold shrink-0">
+      {{ (c.vendor.store_name[0] if current_user.is_customer else c.customer.name[0]) }}
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-bold">{{ c.vendor.store_name if current_user.is_customer else c.customer.name }}</p>
+      <p class="text-xs text-[#6B6480] truncate">
+        {% if c.last_message %}{{ c.last_message.body if c.last_message.body else '📷 Photo' }}{% else %}No messages yet{% endif %}
+      </p>
+    </div>
+    <span class="text-[11px] text-[#6B6480]">{{ c.updated_at.strftime('%b %d') }}</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="text-sm text-[#6B6480] p-8 text-center">No conversations yet.</p>
+{% endif %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}User Management{% endblock %}
+{% block content %}
+<div class="max-w-[1400px] mx-auto px-5 py-6 grid md:grid-cols-[220px_1fr] gap-6">
+  {% include "partials/admin_sidebar.html" %}
+  <div class="bg-white border border-[#E7E3F5] rounded-2xl overflow-hidden">
+    <div class="p-5"><h3 class="font-bold">User Management ({{ users|length }})</h3></div>
+    <table class="w-full text-sm">
+      <thead><tr class="text-xs uppercase tracking-wide text-[#6B6480]">
+        <th class="text-left font-semibold px-5 py-2">Name</th><th class="text-left font-semibold px-5 py-2">Email</th>
+        <th class="text-left font-semibold px-5 py-2">Role</th><th class="text-left font-semibold px-5 py-2">Status</th><th class="px-5 py-2"></th>
+      </tr></thead>
+      <tbody>
+        {% for u in users %}
+        <tr class="border-t border-[#E7E3F5]">
+          <td class="px-5 py-3 flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">{{ u.name[0] }}</div>
+            <span class="font-semibold text-xs">{{ u.name }}</span>
+          </td>
+          <td class="px-5 py-3 text-[#6B6480]">{{ u.email }}</td>
+          <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700">{{ u.role|capitalize }}</span></td>
+          <td class="px-5 py-3">
+            {% if u.is_active_account %}<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700">Active</span>
+            {% else %}<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700">Suspended</span>{% endif %}
+          </td>
+          <td class="px-5 py-3">
+            {% if u.id != current_user.id %}
+            <form action="{{ url_for('admin.toggle_user', user_id=u.id) }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="text-xs font-bold text-violet-600">{{ 'Suspend' if u.is_active_account else 'Reactivate' }}</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
